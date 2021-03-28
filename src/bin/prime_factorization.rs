@@ -87,7 +87,8 @@ fn main() {
     for x in result {
         println!("{}:{}", x.0, x.1);
     }
-    let result = prime_factorization_b(96, make_min_divisors(96));
+    let min_divisors = make_min_divisors(1000000);
+    let result = prime_factorization_b(96, min_divisors);
     println!("{}", result.len()); // 1を素因数分解すると、空ベクトルが返る。
     for x in result {
         println!("{}:{}", x.0, x.1);
