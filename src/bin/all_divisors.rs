@@ -1,6 +1,6 @@
-fn all_divisors(n: i64) -> Vec<i64> {
-    let mut result_increacing = Vec::<i64>::new();
-    let mut result_decreacing = Vec::<i64>::new();
+fn all_divisors(n: usize) -> Vec<usize> {
+    let mut result_increacing = Vec::<usize>::new();
+    let mut result_decreacing = Vec::<usize>::new();
     for i in 1..n {
         if i > n / i {
             break;

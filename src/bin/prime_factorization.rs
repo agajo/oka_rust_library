@@ -56,15 +56,15 @@ fn make_min_divisors(n: usize) -> Vec<usize> {
 
 // minDivisorsをコピーせずに使い回すため、参照渡し
 // 返り値は{素数、その個数}のvector
-fn prime_factorization_b(n: usize, min_divisors: Vec<usize>) -> Vec<(usize, i64)> {
+fn prime_factorization_b(n: usize, min_divisors: Vec<usize>) -> Vec<(usize, usize)> {
     if n > min_divisors.len() - 1 {
         println!("error! n must be <= minDivisors.size()-1");
     } else if n <= 1 {
         return vec![];
     }
-    let mut result: Vec<(usize, i64)> = Vec::new();
-    let mut x: usize = n as usize;
-    let mut last_divisor = min_divisors[n as usize];
+    let mut result: Vec<(usize, usize)> = Vec::new();
+    let mut x = n;
+    let mut last_divisor = min_divisors[n];
     let mut count = 0;
     while x != 1 {
         if min_divisors[x] == last_divisor {
