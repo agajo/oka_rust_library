@@ -56,7 +56,7 @@ fn make_min_divisors(n: usize) -> Vec<usize> {
 
 // minDivisorsをコピーせずに使い回すため、参照渡し
 // 返り値は{素数、その個数}のvector
-fn prime_factorization_b(n: usize, min_divisors: Vec<usize>) -> Vec<(usize, usize)> {
+fn prime_factorization_b(n: usize, min_divisors: &Vec<usize>) -> Vec<(usize, usize)> {
     if n > min_divisors.len() - 1 {
         println!("error! n must be <= minDivisors.size()-1");
     } else if n <= 1 {
@@ -88,7 +88,7 @@ fn main() {
         println!("{}:{}", x.0, x.1);
     }
     let min_divisors = make_min_divisors(1000000);
-    let result = prime_factorization_b(96, min_divisors);
+    let result = prime_factorization_b(96, &min_divisors);
     println!("{}", result.len()); // 1を素因数分解すると、空ベクトルが返る。
     for x in result {
         println!("{}:{}", x.0, x.1);

@@ -39,8 +39,8 @@ impl One for Mn {
         Self {
             v: 1,
             // TODO: CHANGE MODULAR HERE!!
-            m: 7,
-            // m:998_244_353,
+            // m: 7,
+            m: 998_244_353,
             // m:1_000_000_007,
         }
     }
