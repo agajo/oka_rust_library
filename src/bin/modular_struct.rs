@@ -1,5 +1,6 @@
 use num::{pow, One};
 use std::fmt::{Display, Formatter, Result};
+use std::iter::Sum;
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 fn main() {
@@ -16,6 +17,9 @@ fn main() {
     );
     println!("x³:{}, x¹⁰⁰⁰⁰⁰⁰⁰⁰:{}", x.pow(3), x.pow(100000000));
     println!("3≡10:{}", Mn(3) == Mn(10));
+    println!("1+2+...+10:{}", (1..=10).map(|v| Mn(v)).sum::<Mn>());
+
+    // ここからmodular_combinationの使い方
     // TODO: max_nを変更
     let max_n = 10usize.pow(6);
     let mut fac = vec![Mn(0); max_n];
@@ -116,6 +120,15 @@ impl SubAssign for Mn {
         } else {
             MOD - (other.0 - self.0).rem_euclid(MOD)
         });
+    }
+}
+
+impl Sum for Mn {
+    fn sum<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = Self>,
+    {
+        iter.fold(Self(0), |x, y| x + y)
     }
 }
 
