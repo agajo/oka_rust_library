@@ -21,4 +21,7 @@ fn main() {
 
     // nCr
     println!("{}", binomial(5, 3));
+
+    // popcount
+    println!("{}", 7u64.count_ones());
 }
