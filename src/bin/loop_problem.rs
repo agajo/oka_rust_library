@@ -1,18 +1,15 @@
 use proconio::input;
-fn main() {
-    // このコードは、ABC179のE問題に提出したもの
-    // https://atcoder.jp/contests/abc179/tasks/abc179_e
-    input!(n: usize, x: usize, m: usize);
 
-    // TODO: 到達しうる場所のインデックスの最大値+1(通常は到達しうる場所の数)
-    let max_place = m;
-    // TODO: スタート地点
-    let start_at = x;
-    // TODO: スタート地点に移動後のスコア
-    let score_of_start = x;
-    // TODO: 最大移動可能回数
-    let max_step = n - 1;
+// このコードは、ABC179のE問題に提出したもの
+// https://atcoder.jp/contests/abc179/tasks/abc179_e
 
+fn solve_loop(
+    max_place: usize,
+    start_at: usize,
+    score_of_start: usize,
+    max_step: usize,
+    m: usize,
+) -> usize {
     // (step, score)を持ちます
     let mut status_at: Vec<Option<(usize, usize)>> = vec![None; max_place];
 
@@ -48,7 +45,22 @@ fn main() {
             step += 1;
         }
     }
+    score
+}
 
+fn main() {
+    input!(n: usize, x: usize, m: usize);
+
+    // TODO: 到達しうる場所のインデックスの最大値+1(通常は到達しうる場所の数)
+    let max_place = m;
+    // TODO: スタート地点
+    let start_at = x;
+    // TODO: スタート地点に移動後のスコア
+    let score_of_start = x;
+    // TODO: 最大移動可能回数
+    let max_step = n - 1;
+
+    let score = solve_loop(max_place, start_at, score_of_start, max_step, m);
     // TODO: 出力するものはこれでよい？
     println!("{}", score);
 }
