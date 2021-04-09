@@ -1,4 +1,4 @@
-use num::integer::{binomial, div_ceil, div_floor, gcd, mod_floor, Roots};
+use num::integer::{binomial, div_ceil, gcd, mod_floor, Integer, Roots};
 
 fn main() {
     // 整数平方根 ans^2 <= target < (ans+1)^2
@@ -17,11 +17,17 @@ fn main() {
     println!("{}", 17 - 6 * div_ceil(17, 6));
 
     // あまりを捨てる、不足を埋める
-    println!("{}, {}", 10 * div_floor(17, 10), 10 * div_ceil(17, 10));
+    // num::integer::Integer をuseする
+    println!("{}, {}", 17.prev_multiple_of(&10), 17.next_multiple_of(&10));
 
     // nCr
     println!("{}", binomial(5, 3));
 
     // popcount
     println!("{}", 7u64.count_ones());
+
+    // Bezoutの等式
+    // num::integer::Integer をuseする
+    let ans = isize::extended_gcd(&6, &10);
+    println!("6*{} + 10*{} = {}", ans.x, ans.y, ans.gcd);
 }
