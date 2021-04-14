@@ -1,7 +1,7 @@
 use num::integer::{binomial, div_ceil, gcd, mod_floor, Integer, Roots};
 
 fn main() {
-    // 整数平方根 ans^2 <= target < (ans+1)^2
+    // 整数平方根 √target-1 < ans <= √target < ans+1
     println!("{}, {}, {}", 24.sqrt(), 25.sqrt(), 26.sqrt());
 
     // 最大公約数
@@ -14,7 +14,11 @@ fn main() {
     println!("{}", div_ceil(17, 6));
 
     // 不足(-m < ans <= 0)
-    println!("{}", 17 - 6 * div_ceil(17, 6));
+    println!(
+        "{},{}",
+        17 - 6 * div_ceil(17, 6),
+        17 - 17.next_multiple_of(&6)
+    );
 
     // あまりを捨てる、不足を埋める
     // num::integer::Integer をuseする
