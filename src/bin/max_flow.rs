@@ -3,7 +3,7 @@ use std::cmp::min;
 use std::collections::{HashMap, VecDeque};
 
 // 最大流問題を解きます。(最小カット、二部マッチングにも使える)
-// アルゴリズムは
+// アルゴリズムはDinic。
 // targetsは、HashMap。キーは相手、valueは流量。のVector。
 fn max_flow(targets: &Vec<HashMap<usize, usize>>, start: usize, terminate: usize) -> usize {
     let n = targets.len();
@@ -11,45 +11,51 @@ fn max_flow(targets: &Vec<HashMap<usize, usize>>, start: usize, terminate: usize
     let mut targets = targets.clone();
     let mut ans = 0usize;
     loop {
-        // 残余グラフに対し、DFS(メモ化再帰)でルート(増分)を見つける
-        let mut done = vec![false; n];
-        let mut route = Vec::new();
         let level = get_level(&targets, start);
-        let addition = find_route(
-            &mut targets,
-            start,
-            terminate,
-            &mut route,
-            &mut done,
-            &level,
-        );
-        if addition == 0 {
-            // 見つからなかったら終了
+        // 無限に流せると発覚したか、ルートを探し尽くした場合、終了
+        if ans > std::usize::MAX / 4 || level[terminate] == None {
             break;
-        } else if addition > std::usize::MAX / 4 {
-            // 無限増やせる場合は当然答えは無限。
-            ans = std::usize::MAX / 2;
-            break;
-        } else {
-            // 見つかった場合、増分を答えに加え、次の残余グラフを作る
-            if ans > std::usize::MAX - addition {
+        }
+        loop {
+            // 残余グラフに対し、DFS(メモ化再帰)でルート(増分)を見つける
+            let mut done = vec![false; n];
+            let mut route = Vec::new();
+            let addition = find_route(
+                &mut targets,
+                start,
+                terminate,
+                &mut route,
+                &mut done,
+                &level,
+            );
+            if addition == 0 {
+                // 見つからなかったら終了
+                break;
+            } else if addition > std::usize::MAX / 4 {
+                // 無限増やせる場合は当然答えは無限。
                 ans = std::usize::MAX / 2;
+                break;
             } else {
-                ans += addition;
-            }
-            for i in 0..(route.len() - 1) {
-                let &now_capa = targets[route[i]].get(&route[i + 1]).unwrap();
-                if now_capa > addition {
-                    targets[route[i]].insert(route[i + 1], now_capa - addition);
-                } else if now_capa == addition {
-                    targets[route[i]].remove(&route[i + 1]);
+                // 見つかった場合、増分を答えに加え、次の残余グラフを作る
+                if ans > std::usize::MAX - addition {
+                    ans = std::usize::MAX / 2;
                 } else {
-                    targets[route[i]].remove(&route[i + 1]);
-                    let &back = match targets[route[i + 1]].get(&route[i]) {
-                        Some(x) => x,
-                        None => &0,
-                    };
-                    targets[route[i + 1]].insert(route[i], back + addition - now_capa);
+                    ans += addition;
+                }
+                for i in 0..(route.len() - 1) {
+                    let &now_capa = targets[route[i]].get(&route[i + 1]).unwrap();
+                    if now_capa > addition {
+                        targets[route[i]].insert(route[i + 1], now_capa - addition);
+                    } else if now_capa == addition {
+                        targets[route[i]].remove(&route[i + 1]);
+                    } else {
+                        targets[route[i]].remove(&route[i + 1]);
+                        let &back = match targets[route[i + 1]].get(&route[i]) {
+                            Some(x) => x,
+                            None => &0,
+                        };
+                        targets[route[i + 1]].insert(route[i], back + addition - now_capa);
+                    }
                 }
             }
         }
@@ -80,6 +86,7 @@ fn find_route(
         if level[start] == None
             || level[tar] == None
             || level[start].unwrap() >= level[tar].unwrap()
+            || level[terminate].unwrap() < level[tar].unwrap()
         {
             continue;
         }
