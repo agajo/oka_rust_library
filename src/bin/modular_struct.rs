@@ -1,11 +1,12 @@
 use num::{pow, One};
 use std::fmt::{Display, Formatter, Result};
-use std::iter::Sum;
+use std::iter::{Product, Sum};
 use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 fn main() {
     let x = Mn(4);
     let y = Mn(10);
+    let v = vec![Mn(1), Mn(2), Mn(3), Mn(4)];
     println!(
         "x:{}, y:{}, x+y:{}, x*y:{}, x-y:{},y-x:{}",
         x,
@@ -18,16 +19,16 @@ fn main() {
     println!("x³:{}, x¹⁰⁰⁰⁰⁰⁰⁰⁰:{}", x.pow(3), x.pow(100000000));
     println!("3≡10:{}", Mn(3) == Mn(10));
     println!("1+2+...+10:{}", (1..=10).map(|v| Mn(v)).sum::<Mn>());
+    println!("1+2+3+4: {}", v.iter().copied().sum::<Mn>());
+    println!("1*2*3*4: {}", v.iter().copied().product::<Mn>());
 
     // ここからmodular_combinationの使い方
     // TODO: max_nを変更
     let max_n = 10usize.pow(6);
-    let mut fac = vec![Mn(0); max_n];
-    let mut finv = vec![Mn(0); max_n];
-    init_modular_tables(&mut fac, &mut finv);
-    let a = modular_combination(6, 4, &fac, &finv);
-    let b = modular_permutation(6, 4, &fac, &finv);
-    let c = modular_combination(6, 0, &fac, &finv);
+    let (_, fac, fac_inv) = init_modular_tables(max_n);
+    let a = modular_combination(6, 4, &fac, &fac_inv);
+    let b = modular_permutation(6, 4, &fac, &fac_inv);
+    let c = modular_combination(6, 0, &fac, &fac_inv);
 
     println!("6C4:{}, 6P4:{}, 6C0:{}", a, b, c);
 }
@@ -132,16 +133,26 @@ impl Sum for Mn {
     }
 }
 
+impl Product for Mn {
+    fn product<I>(iter: I) -> Self
+    where
+        I: Iterator<Item = Self>,
+    {
+        iter.fold(Self(1), |x, y| x * y)
+    }
+}
+
 // --------------ここまで、構造体Mn(Modular Number)の実装--------------
 
 // --------------ここから二項係数(nCk)の話-----------------------------
 // 構造体Mnからコピペする必要あり！
 
-// テーブルを作る前処理
+// テーブルを作る前処理 (inv, fac, fac_inv) が返ります(所有権ごともらえる)
 // 計算量 O(n)
-fn init_modular_tables(fac: &mut Vec<Mn>, finv: &mut Vec<Mn>) {
-    let max_n = fac.len();
+fn init_modular_tables(max_n: usize) -> (Vec<Mn>, Vec<Mn>, Vec<Mn>) {
     let mut inv = vec![Mn(0); max_n];
+    let mut fac = vec![Mn(0); max_n];
+    let mut finv = vec![Mn(0); max_n];
     fac[0] = Mn(1);
     fac[1] = Mn(1);
     finv[0] = Mn(1);
@@ -154,6 +165,7 @@ fn init_modular_tables(fac: &mut Vec<Mn>, finv: &mut Vec<Mn>) {
         inv[i] = Mn(MOD) - inv[MOD % i] * Mn(MOD / i);
         finv[i] = finv[i - 1] * inv[i];
     }
+    (inv, fac, finv)
 }
 
 // 二項係数計算 nCk
