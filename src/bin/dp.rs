@@ -22,6 +22,7 @@ fn fill_dp_table(dp: &mut Vec<Vec<usize>>, s: &Vec<usize>, t: &Vec<usize>) {
         for j in 1..m {
             // TODO: 漸化式に従って、埋めていく処理。
             // 足す場合も比べる場合も、ここは縦にキレイに並ぶように書くと良い。
+            // 「今の場所を基準に、次の列を更新する(複数回の更新を受けることもある)」の方がラクなこともあるよ！！
             let mut ans = std::usize::MAX;
             ans = min(ans, dp[i - 1][j] + 1);
             ans = min(ans, dp[i][j - 1] + 1);

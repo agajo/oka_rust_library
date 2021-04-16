@@ -3,12 +3,14 @@ use proconio::input;
 // このコードは、ABC179のE問題に提出したもの
 // https://atcoder.jp/contests/abc179/tasks/abc179_e
 
+// approachとperiodだけ返すような改造方針もある。その場合移動回数は限界+2くらいにしとくと確実。
+
 fn solve_loop(
     max_place: usize,
     start_at: usize,
     score_of_start: usize,
     max_step: usize,
-    m: usize,
+    modulus: usize,
 ) -> usize {
     // (step, score)を持ちます
     let mut status_at: Vec<Option<(usize, usize)>> = vec![None; max_place];
@@ -40,7 +42,7 @@ fn solve_loop(
             status_at[now_at] = Some((step, score));
             // 移動(現在地を変え、歩数とスコアを移動後のものに更新)
             // TODO: スコアも移動先も問題によって違う！書き換えて！
-            now_at = (now_at * now_at).rem_euclid(m);
+            now_at = (now_at * now_at).rem_euclid(modulus);
             score += now_at;
             step += 1;
         }
