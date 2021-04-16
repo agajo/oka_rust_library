@@ -6,6 +6,8 @@ fn main() {
     let v: Vec<char> = vec!['1', '4', '1', '4'];
     const F: f64 = 1.732;
     const C: char = 'j';
+    const CH: char = '7';
+    const N3: isize = 7;
 
     // &str -> String -> i64
     let n0: i64 = S.to_string().parse::<i64>().unwrap();
@@ -22,6 +24,15 @@ fn main() {
     // &str -> String -> Chars<'_> -> Vec<char>
     let v0: Vec<char> = S.to_string().chars().collect(); // collect::<Vec<_>>() としてもOK
     println!("{}", v0.iter().collect::<String>());
+
+    // TODO: char→isize
+    let n3: isize = CH.to_digit(10).unwrap() as isize;
+    let n4: isize = (CH as u8 - b'0') as isize;
+    println!("{}, {}", n3, n4);
+
+    // TODO: isize->char
+    let c0: char = std::char::from_digit(N3 as u32, 10).unwrap();
+    println!("{}", c0);
 
     // i64 -> f64
     let f0: f64 = N as f64 / N2 as f64;
