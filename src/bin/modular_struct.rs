@@ -24,7 +24,8 @@ fn main() {
 
     // ここからmodular_combinationの使い方
     // TODO: max_nを変更
-    let max_n = 10usize.pow(6);
+    // let max_n = 10usize.pow(6);
+    let max_n = 6;
     let (_, fac, fac_inv) = init_modular_tables(max_n);
     let a = modular_combination(6, 4, &fac, &fac_inv);
     let b = modular_permutation(6, 4, &fac, &fac_inv);
@@ -150,15 +151,18 @@ impl Product for Mn {
 // テーブルを作る前処理 (inv, fac, fac_inv) が返ります(所有権ごともらえる)
 // 計算量 O(n)
 fn init_modular_tables(max_n: usize) -> (Vec<Mn>, Vec<Mn>, Vec<Mn>) {
-    let mut inv = vec![Mn(0); max_n];
-    let mut fac = vec![Mn(0); max_n];
-    let mut finv = vec![Mn(0); max_n];
+    if max_n >= MOD {
+        panic!("max_n >= MODの時は使えないよ！別の手を考えて！")
+    }
+    let mut inv = vec![Mn(0); max_n + 1];
+    let mut fac = vec![Mn(0); max_n + 1];
+    let mut finv = vec![Mn(0); max_n + 1];
     fac[0] = Mn(1);
     fac[1] = Mn(1);
     finv[0] = Mn(1);
     finv[1] = Mn(1);
     inv[1] = Mn(1);
-    for i in 2..max_n {
+    for i in 2..=max_n {
         let mi = Mn(i);
         fac[i] = fac[i - 1] * mi;
         // 何でこれで順にinv[i]が出るんや2020-06-30
