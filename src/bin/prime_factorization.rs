@@ -1,25 +1,27 @@
+use std::collections::BTreeMap;
 // =========素因数分解Aここから下をコピペ============
 // 試し割りによる方法。O(√n)です。m回やるならO(m√n)
-// 返り値は{素数、その個数}のvector
-fn prime_factorization_a(n: i64) -> Vec<(i64, i64)> {
-    let mut ans: Vec<(i64, i64)> = Vec::new();
+// 返り値は{素数、その個数}のBTreeMap
+// HashMapでない理由は、素数を小さい順に見る、とかしたいかもしれないから。
+fn prime_factorization_a(n: usize) -> BTreeMap<usize, usize> {
+    let mut ans = BTreeMap::new();
     let mut k = n;
     for i in 2..n {
         if i > n / i {
             break;
         }
 
-        let mut count: i64 = 0;
+        let mut count = 0;
         while k % i == 0 {
             count += 1;
             k /= i;
         }
         if count > 0 {
-            ans.push((i, count));
+            ans.insert(i, count);
         }
     }
     if k != 1 {
-        ans.push((k, 1));
+        ans.insert(k, 1);
     }
     ans
 }
@@ -55,14 +57,14 @@ fn make_min_divisors(n: usize) -> Vec<usize> {
 }
 
 // minDivisorsをコピーせずに使い回すため、参照渡し
-// 返り値は{素数、その個数}のvector
-fn prime_factorization_b(n: usize, min_divisors: &Vec<usize>) -> Vec<(usize, usize)> {
+// 返り値は{素数、その個数}のBTreeMap
+fn prime_factorization_b(n: usize, min_divisors: &Vec<usize>) -> BTreeMap<usize, usize> {
     if n > min_divisors.len() - 1 {
         println!("error! n must be <= minDivisors.size()-1");
     } else if n <= 1 {
-        return vec![];
+        return BTreeMap::new();
     }
-    let mut result: Vec<(usize, usize)> = Vec::new();
+    let mut result = BTreeMap::new();
     let mut x = n;
     let mut last_divisor = min_divisors[n];
     let mut count = 0;
@@ -71,26 +73,28 @@ fn prime_factorization_b(n: usize, min_divisors: &Vec<usize>) -> Vec<(usize, usi
             count += 1;
             x = x / min_divisors[x];
         } else {
-            result.push((last_divisor, count));
+            result.insert(last_divisor, count);
             last_divisor = min_divisors[x];
             count = 0;
         }
     }
-    result.push((last_divisor, count));
+    result.insert(last_divisor, count);
     result
 }
 // =========素因数分解Bここまで============
 
 fn main() {
+    let result = prime_factorization_a(1);
+    println!("1 → {}", result.len()); // 1を素因数分解すると、空ベクトルが返る。
     let result = prime_factorization_a(96);
-    println!("{}", result.len()); // 1を素因数分解すると、空ベクトルが返る。
-    for x in result {
-        println!("{}:{}", x.0, x.1);
+    for (p, count) in result {
+        println!("{}:{}", p, count);
     }
     let min_divisors = make_min_divisors(1000000);
+    let result = prime_factorization_a(1);
+    println!("1 → {}", result.len()); // 1を素因数分解すると、空ベクトルが返る。
     let result = prime_factorization_b(96, &min_divisors);
-    println!("{}", result.len()); // 1を素因数分解すると、空ベクトルが返る。
-    for x in result {
-        println!("{}:{}", x.0, x.1);
+    for (p, count) in result {
+        println!("{}:{}", p, count);
     }
 }
