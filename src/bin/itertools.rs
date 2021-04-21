@@ -20,4 +20,11 @@ fn main() {
     result.for_each(|v| {
         println!("{:?}", v);
     });
+
+    // 順列全列挙
+    let v = vec![2, 1, 2, 3];
+    let result = v.iter().permutations(2);
+    for x in result {
+        println!("{:?}", x);
+    }
 }

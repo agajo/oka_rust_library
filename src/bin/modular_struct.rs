@@ -173,12 +173,8 @@ fn init_modular_tables(max_n: usize) -> (Vec<Mn>, Vec<Mn>, Vec<Mn>) {
 }
 
 // 二項係数計算 nCk
-// 先にinitModularTables()を呼んでおくこと！
+// initModularTables()で作ったfacとfac_invを渡す
 fn modular_combination(n: usize, k: usize, fac: &Vec<Mn>, finv: &Vec<Mn>) -> Mn {
-    if fac[5] != Mn(120) {
-        println!("call initModularTables() first!!!!!!!!");
-        return Mn(0);
-    }
     if n < k {
         return Mn(0);
     }
@@ -186,12 +182,8 @@ fn modular_combination(n: usize, k: usize, fac: &Vec<Mn>, finv: &Vec<Mn>) -> Mn 
 }
 
 // 順列計算 nPk
-// 先にinitModularTables()を呼んでおくこと！
+// initModularTables()で作ったfacとfac_invを渡す
 fn modular_permutation(n: usize, k: usize, fac: &Vec<Mn>, finv: &Vec<Mn>) -> Mn {
-    if fac[5] != Mn(120) {
-        println!("call initModularTables() first!!!!!!!!");
-        return Mn(0);
-    }
     if n < k {
         return Mn(0);
     }
