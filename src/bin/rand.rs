@@ -16,6 +16,7 @@ fn main() {
     let end = start.elapsed();
     println!("{},time: {}, sr.gen()", x, end.as_millis());
 
+    // SeedableRngも必要！！
     let mut sr = SmallRng::from_entropy();
 
     // 指定範囲の整数から一つ選ぶ
