@@ -25,12 +25,12 @@ fn main() {
     let v0: Vec<char> = S.to_string().chars().collect(); // collect::<Vec<_>>() としてもOK
     println!("{}", v0.iter().collect::<String>());
 
-    // TODO: char→isize
+    // char→isize
     let n3: isize = CH.to_digit(10).unwrap() as isize;
     let n4: isize = (CH as u8 - b'0') as isize;
     println!("{}, {}", n3, n4);
 
-    // TODO: isize->char
+    // isize->char
     let c0: char = std::char::from_digit(N3 as u32, 10).unwrap();
     println!("{}", c0);
 
