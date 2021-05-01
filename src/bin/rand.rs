@@ -20,8 +20,8 @@ fn main() {
     let mut sr = SmallRng::from_entropy();
 
     // 指定範囲の整数から一つ選ぶ
-    let uniform = Uniform::new(10, 20);
-    let x = uniform.sample(&mut sr);
+    let ten_twenty = Uniform::new(10, 20);
+    let x = ten_twenty.sample(&mut sr);
     println!("{}", x);
 
     // Vecからn個選ぶ (一度選ばれたものは選ばれない。順番もランダムになる)
