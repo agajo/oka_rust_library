@@ -24,7 +24,7 @@ fn bs(n: usize, k: isize, a: &Vec<isize>, f: &Vec<isize>) -> isize {
         // l < 目的の整数 <= mid (ansIsInLeftRange)なのか
         // mid < 目的の整数 <= right (!ansIsInLeftRange)なのかを判定します。
         // TODO: その判定方法は問題によって違う
-        // ここの判定によって、統合不等号がどっちになるのか決まる！ここを先に決めてから判断すること！
+        // ここの判定によって、等号不等号がどっちになるのか決まる！ここを先に決めてから判断すること！
 
         let mut k_needs = 0;
         for i in 0..n {
