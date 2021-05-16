@@ -12,7 +12,8 @@
             "args": [],
             "preLaunchTask": "build active file",
             "cwd": "${workspaceFolder}",
-            "env": { "RUST_BACKTRACE": "1" }
+            "env": { "RUST_BACKTRACE": "1" },
+            "stdio": [null,null,null]
         }
     ]
 }

@@ -8,8 +8,18 @@ use std::process::Command;
 // out_svg/xxxx.svg という名前で出力されるように。
 
 fn main() {
-    // TODO: このframesはフォルダ調べて取得できるはずだ
-    let frames = 100;
+    let read_dir = std::fs::read_dir("out_txt").unwrap();
+    let frames = read_dir
+        .filter(|x| {
+            x.as_ref()
+                .unwrap()
+                .file_name()
+                .into_string()
+                .unwrap()
+                .ends_with(".txt")
+        })
+        .collect::<Vec<_>>()
+        .len();
     for i in 0..frames {
         let mut command = Command::new("cargo");
         command.args(&[
@@ -18,10 +28,11 @@ fn main() {
             "--bin",
             "vis",
             "in/0000.txt", // TODO: 入力ファイルはこれ固定でいいのか？
-            &format!("out/{:>04}.txt", i),
+            &format!("out_txt/{:>04}.txt", i),
         ]);
         let _ = command.spawn();
     }
+    let _ = std::fs::create_dir("out_svg");
     let mut file = File::create("out_svg/frames.txt").unwrap();
     file.write_all(frames.to_string().as_bytes()).unwrap();
 }

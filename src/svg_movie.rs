@@ -11,7 +11,8 @@ pub struct SvgMovie {
 }
 
 impl SvgMovie {
-    pub fn new(directory_name: String) -> SvgMovie {
+    pub fn new() -> SvgMovie {
+        let directory_name = "out_txt".to_string();
         let _ = std::fs::create_dir(&directory_name);
         SvgMovie {
             frame_count: 0,
