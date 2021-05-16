@@ -1,4 +1,19 @@
 <html>
+    <!--
+        ビジュアライズのやり方忘れそうなのでここにメモ。
+        必要なもの
+        ・src/lib.rs
+        ・src/svg_movie.rs
+        ・src/bin/txts2svgs.rs
+        ・visualize.html(this file)
+        ・visualize.js
+        普通に解答を作り、時々SvgMovie構造体を使って、途中解答(out/xxxx.txt)を書き出す。
+        公式ビジュアライザを、out/xxxx.txtに応じたout_svg/xxxx.svgを書き出すように改造
+        txts2svgs.rsを、コマンドを公式ビジュアライザの使い方に寄せた上で実行
+        visualize.htmlを開いて動画再生
+
+        提出時は途中出力をしないように注意！
+    -->
 
     <head>
         <script src="visualize.js"></script>
