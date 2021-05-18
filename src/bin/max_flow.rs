@@ -1,17 +1,18 @@
+use petgraph::prelude::*;
 use proconio::input;
 use std::cmp::min;
-use std::collections::{HashMap, VecDeque};
+use std::collections::VecDeque;
 
-// 最大流問題を解きます。(最小カット、二部マッチングにも使える)
+// 最大流問題を解きます。(最小カット、二部マッチング、燃やす埋めるにも使える)
 // アルゴリズムはDinic。
 // targetsは、HashMap。キーは相手、valueは流量。のVector。
-fn max_flow(targets: &Vec<HashMap<usize, usize>>, start: usize, terminate: usize) -> usize {
-    let n = targets.len();
+fn max_flow(graph: &Graph<(), usize, Directed, usize>, start: usize, terminate: usize) -> usize {
+    let n = graph.node_count();
     // 残余グラフです。
-    let mut targets = targets.clone();
+    let mut graph = graph.clone();
     let mut ans = 0usize;
     loop {
-        let level = get_level(&targets, start);
+        let level = get_level(&graph, start);
         // 無限に流せると発覚したか、ルートを探し尽くした場合、終了
         if ans > std::usize::MAX / 4 || level[terminate] == None {
             break;
@@ -20,14 +21,7 @@ fn max_flow(targets: &Vec<HashMap<usize, usize>>, start: usize, terminate: usize
             // 残余グラフに対し、DFS(メモ化再帰)でルート(増分)を見つける
             let mut done = vec![false; n];
             let mut route = Vec::new();
-            let addition = find_route(
-                &mut targets,
-                start,
-                terminate,
-                &mut route,
-                &mut done,
-                &level,
-            );
+            let addition = find_route(&mut graph, start, terminate, &mut route, &mut done, &level);
             if addition == 0 {
                 // 見つからなかったら終了
                 break;
@@ -43,18 +37,42 @@ fn max_flow(targets: &Vec<HashMap<usize, usize>>, start: usize, terminate: usize
                     ans += addition;
                 }
                 for i in 0..(route.len() - 1) {
-                    let &now_capa = targets[route[i]].get(&route[i + 1]).unwrap();
+                    let edge = graph
+                        .edges_connecting(NodeIndex::from(route[i]), NodeIndex::from(route[i + 1]))
+                        .next()
+                        .unwrap();
+                    let edge_id = edge.id();
+                    let now_capa = *edge.weight();
                     if now_capa > addition {
-                        targets[route[i]].insert(route[i + 1], now_capa - addition);
+                        graph.update_edge(
+                            NodeIndex::from(route[i]),
+                            NodeIndex::from(route[i + 1]),
+                            now_capa - addition,
+                        );
                     } else if now_capa == addition {
-                        targets[route[i]].remove(&route[i + 1]);
+                        graph.remove_edge(edge_id);
                     } else {
-                        targets[route[i]].remove(&route[i + 1]);
-                        let &back = match targets[route[i + 1]].get(&route[i]) {
-                            Some(x) => x,
-                            None => &0,
-                        };
-                        targets[route[i + 1]].insert(route[i], back + addition - now_capa);
+                        graph.remove_edge(edge_id);
+                        if let Some(back_edge) = graph
+                            .edges_connecting(
+                                NodeIndex::from(route[i + 1]),
+                                NodeIndex::from(route[i]),
+                            )
+                            .next()
+                        {
+                            let back_edge_weight = *back_edge.weight();
+                            graph.update_edge(
+                                NodeIndex::from(route[i + 1]),
+                                NodeIndex::from(route[i]),
+                                back_edge_weight + addition - now_capa,
+                            );
+                        } else {
+                            graph.add_edge(
+                                NodeIndex::from(route[i + 1]),
+                                NodeIndex::from(route[i]),
+                                addition - now_capa,
+                            );
+                        }
                     }
                 }
             }
@@ -66,7 +84,7 @@ fn max_flow(targets: &Vec<HashMap<usize, usize>>, start: usize, terminate: usize
 // 通るノードを並べたVecを更新し、流量増分を返します
 // メモdoneの中身は「未調査」か「調査済み(今調べてるルートの途中も含む)」かどちらか
 fn find_route(
-    targets: &Vec<HashMap<usize, usize>>,
+    graph: &Graph<(), usize, Directed, usize>,
     start: usize,
     terminate: usize,
     route: &mut Vec<usize>,
@@ -82,7 +100,9 @@ fn find_route(
     if start == terminate {
         return std::usize::MAX / 2;
     }
-    for (&tar, &capa) in targets[start].iter() {
+    for edge in graph.edges(NodeIndex::from(start)) {
+        let tar = edge.target().index();
+        let capa = *edge.weight();
         if level[start] == None
             || level[tar] == None
             || level[start].unwrap() >= level[tar].unwrap()
@@ -90,7 +110,7 @@ fn find_route(
         {
             continue;
         }
-        let flow = find_route(&targets, tar, terminate, route, done, level);
+        let flow = find_route(&graph, tar, terminate, route, done, level);
         if flow > 0 {
             return min(flow, capa);
         }
@@ -100,15 +120,17 @@ fn find_route(
 }
 
 // 残余グラフを受け取って、各ノードまでの最短距離を記録したものを返します
-fn get_level(targets: &Vec<HashMap<usize, usize>>, s: usize) -> Vec<Option<usize>> {
-    let n = targets.len();
+fn get_level(graph: &Graph<(), usize, Directed, usize>, s: usize) -> Vec<Option<usize>> {
+    let n = graph.node_count();
     let mut level = vec![None; n];
     let mut que = VecDeque::new();
     que.push_back(s);
     level[s] = Some(0);
     while !que.is_empty() {
         let now = que.pop_front().unwrap();
-        for (&tar, &capa) in targets[now].iter() {
+        for edge in graph.edges(NodeIndex::from(now)) {
+            let tar = edge.target().index();
+            let capa = *edge.weight();
             if level[tar] == None && capa > 0 {
                 level[tar] = Some(level[now].unwrap() + 1);
                 que.push_back(tar);
@@ -118,33 +140,52 @@ fn get_level(targets: &Vec<HashMap<usize, usize>>, s: usize) -> Vec<Option<usize
     level
 }
 
-// 最大フロー、最小カット、二部マッチングは全部これで解けるはず。
+// 最大フロー、最小カット、二部マッチング、燃やす埋めるは全部これで解けるはず。
 fn main() {
     // ARC074 F をやってみます。
     input! {h:usize,w:usize,a:[String;h]}
     let a: Vec<Vec<char>> = a.iter().map(|s| s.chars().collect()).collect();
-    let mut targets: Vec<HashMap<usize, usize>> = vec![HashMap::new(); h + w];
+    let mut graph: Graph<(), usize, Directed, usize> = Graph::default();
+    for _ in 0..(h + w) {
+        graph.add_node(());
+    }
     let mut s: usize = 0;
     let mut t: usize = 0;
     for i in 0..h {
         for j in 0..w {
             if a[i][j] == 'o' {
-                targets[i].insert(h + j, 1);
-                targets[h + j].insert(i, 1);
+                graph.add_edge(NodeIndex::from(i), NodeIndex::from(h + j), 1);
+                graph.add_edge(NodeIndex::from(h + j), NodeIndex::from(i), 1);
             } else if a[i][j] == 'S' {
                 s = i;
-                targets[i].insert(h + j, std::usize::MAX / 2);
-                targets[h + j].insert(i, std::usize::MAX / 2);
+                graph.add_edge(
+                    NodeIndex::from(i),
+                    NodeIndex::from(h + j),
+                    std::usize::MAX / 2,
+                );
+                graph.add_edge(
+                    NodeIndex::from(h + j),
+                    NodeIndex::from(i),
+                    std::usize::MAX / 2,
+                );
             } else if a[i][j] == 'T' {
                 t = i;
-                targets[i].insert(h + j, std::usize::MAX / 2);
-                targets[h + j].insert(i, std::usize::MAX / 2);
+                graph.add_edge(
+                    NodeIndex::from(i),
+                    NodeIndex::from(h + j),
+                    std::usize::MAX / 2,
+                );
+                graph.add_edge(
+                    NodeIndex::from(h + j),
+                    NodeIndex::from(i),
+                    std::usize::MAX / 2,
+                );
             }
         }
     }
     let s = s;
     let t = t;
-    let ans = max_flow(&targets, s, t);
+    let ans = max_flow(&graph, s, t);
     println!(
         "{}",
         if ans > std::usize::MAX / 4 {
