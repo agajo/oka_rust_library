@@ -49,6 +49,18 @@ fn main() {
     // TODO: クエリの処理
     update_tree(&mut tree, 7, 100);
     let result = get_sum(&tree, 9) - get_sum(&tree, 4);
-    println!("{}", result); // 127
-    println!("{}", get_sum(&tree, 0)); // 0
+    println!("127: {}", result); // 127
+    println!("0: {}", get_sum(&tree, 0)); // 0
+
+    // 転倒数を求める例
+    // 1からnの並び替えになっていること！
+    let n = 7;
+    let c = vec![3, 1, 4, 5, 7, 2, 6];
+    let mut tree = vec![0; n + 1];
+    let mut tento = 0usize;
+    for i in 1..=n {
+        update_tree(&mut tree, c[i - 1], 1);
+        tento += i - get_sum(&tree, c[i - 1]);
+    }
+    println!("tento: 6: {}", tento); // 6
 }
