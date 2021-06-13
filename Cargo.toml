@@ -12,3 +12,4 @@ num = "0.4"
 itertools = "0.10.0"
 petgraph = "0.5.0"
 rand = { version = "0.7.2", features = ["small_rng"] }
+nalgebra = "0.25.4"
