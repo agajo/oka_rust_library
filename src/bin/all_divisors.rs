@@ -1,7 +1,7 @@
 fn all_divisors(n: usize) -> Vec<usize> {
     let mut result_increacing = Vec::<usize>::new();
     let mut result_decreacing = Vec::<usize>::new();
-    for i in 1..n {
+    for i in 1..=n {
         if i > n / i {
             break;
         }
@@ -19,7 +19,7 @@ fn all_divisors(n: usize) -> Vec<usize> {
 }
 
 fn main() {
-    let v = all_divisors(400);
+    let v = all_divisors(36);
     for x in v {
         println!("{}", x);
     }
