@@ -1,20 +1,23 @@
-use num::{pow, One};
+use num::integer::Integer;
+use num::{pow, One, Zero};
 use std::fmt::{Display, Formatter, Result};
 use std::iter::{Product, Sum};
-use std::ops::{Add, AddAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 fn main() {
     let x = Mn(4);
     let y = Mn(10);
     let v = vec![Mn(1), Mn(2), Mn(3), Mn(4)];
     println!(
-        "x:{}, y:{}, x+y:{}, x*y:{}, x-y:{},y-x:{}",
+        "x:{}, y:{}, x+y:{}, x*y:{}, x-y:{}, y-x:{}, x/y:{}, y/x:{}",
         x,
         y,
         x + y,
         x * y,
         x - y,
         y - x,
+        x / y,
+        y / x,
     );
     println!("x³:{}, x¹⁰⁰⁰⁰⁰⁰⁰⁰:{}", x.pow(3), x.pow(100000000));
     println!("3≡10:{}", Mn(3) == Mn(10));
@@ -45,6 +48,15 @@ const MOD: usize = 7;
 // 表示時は保証します。
 #[derive(Debug, Copy, Clone)]
 struct Mn(usize);
+
+impl Zero for Mn {
+    fn zero() -> Self {
+        Self(0)
+    }
+    fn is_zero(&self) -> bool {
+        self.0.rem_euclid(MOD) == 0
+    }
+}
 
 impl One for Mn {
     fn one() -> Self {
@@ -122,6 +134,27 @@ impl SubAssign for Mn {
         } else {
             MOD - (other.0 - self.0).rem_euclid(MOD)
         });
+    }
+}
+
+impl Div for Mn {
+    type Output = Self;
+    fn div(self, other: Self) -> Self {
+        let ans = isize::extended_gcd(&(other.0 as isize), &(MOD as isize));
+        if ans.gcd != 1 {
+            panic!("逆数が存在しないよ！互いに素じゃないよ！")
+        }
+        Mn((ans.x).rem_euclid(MOD as isize) as usize) * self
+    }
+}
+
+impl DivAssign for Mn {
+    fn div_assign(&mut self, other: Self) {
+        let ans = isize::extended_gcd(&(other.0 as isize), &(MOD as isize));
+        if ans.gcd != 1 {
+            panic!("逆数が存在しないよ！互いに素じゃないよ！")
+        }
+        *self = Mn((ans.x).rem_euclid(MOD as isize) as usize) * (*self);
     }
 }
 
